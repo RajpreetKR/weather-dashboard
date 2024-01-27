@@ -1,0 +1,22 @@
+/* header css */
+.weather-header {
+    background-image: linear-gradient(to right, #3463bc , #200a4c);
+    color: white;
+}
+
+#form-heading {
+    font-size: 25px;
+}
+
+/* search button css */
+.search-button {
+    background-color: #5098e6;
+    color: white; /* text colour */
+    margin-top: 5px;
+    padding: 5px 71px;
+}
+
+:hover.search-button {
+    background-color: #3b87d8;
+    color: white;
+}
