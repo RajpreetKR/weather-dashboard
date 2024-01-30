@@ -1,35 +1,59 @@
-// What references should we GRAB onto?
-var forecastContainer = $('#forecast')  // document.querySelector()
-var curretContainer = $('#today')  // document.querySelector()
-var historyContainer = $('#history')  // document.querySelector()
 
-var userInput = $('#search-input');
-var button = $('#search-button');
+let forecastContainer = $('#forecast')  // document.querySelector()
+let curretContainer = $('#today')  // document.querySelector()
+let historyContainer = $('#history')  // document.querySelector()
+
+let userInput = $('#search-input');
+let button = $('#search-button');
+
+let cityDiv = $("#city");
+let weatherIcon = $("#weather-icon");
+let weatherInfo = $("#weather-info");
+let tempDiv = $("#temp");
+let windDiv = $("#wind");
+let humidityDiv = $("#humidity");
 
 // Grab Existing data from localStorage
+let cities = JSON.parse(localStorage.getItem("cities"));
+console.log(cities);
+if (cities === null) {
+    cities = [];
+}
 
 button.on('click', function(event) {
     event.preventDefault();
-   //  console.log("click....");
 
-    // what is our next step(?)  --> what are we trying to capture(?)
-    var city = userInput.val();
+    let city = userInput.val();
     console.log("City: ", city);
+
+    // checks if input is empty
+    if (!city) {
+        alert("Please enter a city.");
+        return;
+    }
+
+    console.log(cities);
+    cities.push(city);
 
     // we have TWO diffenerent operations that need to take place
     // save city --> to localStorage --> Add to historyContainer
-    // we make a request to an API 
 
-    console.log("I am code BEFORE the fetch/ASYNC method")
-    var apiKey = "9564ca6e43e7b3805e7aa62c93244e8c"
-    var baseUrl = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&APPID=" + apiKey;
+    localStorage.setItem("cities", JSON.stringify(cities));
 
-    console.log("REquest URL: ", baseUrl)
+    let searchHistory = $("<button></button>").text(city);
+    historyContainer.append(searchHistory);
 
-    fetch(baseUrl)          // is an Async method that RETURNS a PROMISE  --> Handling a PRomise
+    // makes a request to an API 
+    console.log("I am code BEFORE the fetch/ASYNC method");
+    const apiKey = "9564ca6e43e7b3805e7aa62c93244e8c";
+    let baseUrl = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&APPID=" + apiKey;
+
+    console.log("Request URL: ", baseUrl);
+
+    fetch(baseUrl)          // is an Async method that RETURNS a PROMISE --> Handling a Promise
         .then(function(response) {
-            console.log("I am code INSIDE the SUCCESS RESPONSE fetch/ASYNC method")
-            console.log("Response Object: ", response)
+            console.log("I am code INSIDE the SUCCESS RESPONSE fetch/ASYNC method");
+            console.log("Response Object: ", response);
             // SUCCESS STATE
             return response.json();
         })
@@ -38,14 +62,39 @@ button.on('click', function(event) {
 
             // HERE in this callback function SCOPE we have acess to the requested DATA
 
-            // dig INTO our dataset (object)
-            console.log("Lattitude: ", data.coord.lat)
-            console.log("Longitude: ", data.coord.lon)
+            // digs INTO the dataset (object)
+            let lattitude = data.coord.lat;
+            let longitude = data.coord.lon;// gets the lat and lon from the data
+            let forecastUrl = "https://api.openweathermap.org/data/2.5/weather?lat=" + lattitude + "&lon=" + longitude + "&appid=" + apiKey;
+
+            showWeather(data);
         })
         .catch(function(error) {
             // ERROR STATE
             console.log("Error: ", error);
+            alert("Error fetching current weather data. PLease try again.")
         })
 
-    console.log("I am code AFTER the fetch/ASYNC method")
+    console.log("I am code AFTER the fetch/ASYNC method");
+
+    function showWeather(data) {
+    let cityName = data.name;
+    let weatherDesc = data.weather[0].description;
+    let temperature = Math.round(data.main.temp - 273.15); // converts to celsius
+    let windSpeed = data.wind.speed;
+    let humidityInfo = data.main.humidity;
+
+    cityDiv.text(cityName);
+    weatherInfo.text(weatherDesc);
+    tempDiv.text(temperature);
+    windDiv.text(windSpeed);
+    humidityDiv.text(humidityInfo);
+    }
+
+    
 })
+
+for (let i=0; i<cities.length; i++) {
+        let searchHistory = $("<button></button>").text(cities[i]);
+        historyContainer.append(searchHistory);
+    }
