@@ -35,7 +35,6 @@ button.on('click', function(event) {
     console.log(cities);
     cities.push(city);
 
-    // we have TWO diffenerent operations that need to take place
     // save city --> to localStorage --> Add to historyContainer
 
     localStorage.setItem("cities", JSON.stringify(cities));
